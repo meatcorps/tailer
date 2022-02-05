@@ -49,11 +49,15 @@ export class HomeComponent implements OnInit, AfterViewInit  {
   }
 
   ngOnInit(): void {
-    console.log('HomeComponent INIT');
+    console.log('HomeComponent INIT');//ipc-setup
     // setTimeout(() => this.electronService.ipcRenderer.send('ipc-test', ['whatever']), 100);
     this.electronService.ipcRenderer.on('ipc-receive-debug', (event, arg) => {
       console.log('debug', arg);
     });
+    this.electronService.ipcRenderer.on('ipc-receive-resetdata', (event, arg) => {
+      this.aceEditor.session.setValue('');
+    });
+    
     this.electronService.ipcRenderer.on('ipc-receive-data', (event, arg) => {
       // this.aceEditor.session.setValue(arg);
       let toAdd: string = arg;

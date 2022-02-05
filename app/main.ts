@@ -95,11 +95,20 @@ try {
   // throw e;
 }
 
+let mainEvent = null;
+
+ipcMain.on('ipc-setup', (event, args) => {
+  mainEvent = event;
+});
 
 ipcMain.on('ipc-test', (event, args) => {
   const result = dialog.showOpenDialogSync({ properties: ['openFile', 'multiSelections'] });
   // dialog.showMessageBox({message: JSON.stringify(result)});
-  event.sender.send('ipc-test-replay', result);
+  //event.sender.send
+  mainEvent.sender.send('ipc-test-replay', result);
+  mainEvent.sender.send('ipc-receive-resetdata', '');
+  mainEvent.sender.send('ipc-receive-debug', ['setup', result[0]]);
+  currentData = 0;
   getFileData(result[0], event);
   setupWatch(result[0], event);
 });
@@ -110,11 +119,11 @@ function getFileData(filename: string, event: any) {
     if (tempData.length == 0) { return; }
     if (currentData > tempData.length) {
       currentData = 0;
-      event.sender.send('ipc-receive-debug', ['reset', currentData, tempData.length]);
+      mainEvent.sender.send('ipc-receive-debug', ['reset', currentData, tempData.length]);
     }
     if (tempData.length !== currentData) {
-      event.sender.send('ipc-receive-debug', [tempData.length, currentData]);
-      event.sender.send('ipc-receive-data', tempData.substring(currentData));
+      mainEvent.sender.send('ipc-receive-debug', [tempData.length, currentData]);
+      mainEvent.sender.send('ipc-receive-data', tempData.substring(currentData));
       currentData = tempData.length;
     }
   } catch (err) {
@@ -132,7 +141,7 @@ function setupWatch(file: string, event: any) {
   watcher.on('raw', (fileevent, path, details) => {
     // This event should be triggered everytime something happens.
     getFileData(file, event);
-    event.sender.send('ipc-receive-debug', ['Raw event info:', fileevent, path, details]);
+    ipcMain.emit('ipc-receive-debug', ['Raw event info:', fileevent, path, details]);
 
   });
 }

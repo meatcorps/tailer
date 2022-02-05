@@ -7,8 +7,8 @@ export function menu() {
           submenu: [
             { 
                 label: 'Open',
-                click: () => {
-                    ipcMain.emit('ipc-test')
+                click: async () => {
+                    require('electron').ipcMain.emit('ipc-test')
                 }
             },
             { role: 'quit' }

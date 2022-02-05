@@ -46,9 +46,12 @@ function menu() {
             submenu: [
                 {
                     label: 'Open',
-                    click: function () {
-                        ipcMain.emit('ipc-test');
-                    }
+                    click: function () { return __awaiter(_this, void 0, void 0, function () {
+                        return __generator(this, function (_a) {
+                            require('electron').ipcMain.emit('ipc-test');
+                            return [2 /*return*/];
+                        });
+                    }); }
                 },
                 { role: 'quit' }
             ]
