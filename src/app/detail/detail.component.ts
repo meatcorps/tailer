@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { ElectronService } from '../core/services';
+
+declare var electron: any;
 
 @Component({
   selector: 'app-detail',
@@ -7,10 +10,18 @@ import { Component, OnInit } from '@angular/core';
 })
 export class DetailComponent implements OnInit {
 
-  constructor() { }
+  constructor(private electronService: ElectronService) { }
 
   ngOnInit(): void {
     console.log('DetailComponent INIT');
+    
+    this.electronService.ipcRenderer.on('ipc-test-replay', (event, arg) => {
+      console.log('ipc-test-replay', arg);
+    });
+  
    }
 
+  doit() {
+    this.electronService.ipcRenderer.send('ipc-test', ['whatever']);
+  }
 }

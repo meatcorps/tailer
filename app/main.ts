@@ -1,11 +1,18 @@
-import { app, BrowserWindow, screen } from 'electron';
+import { app, BrowserWindow, screen, dialog, ipcMain } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as url from 'url';
+import * as chokidar from 'chokidar';
+import { menu } from './menu';
 
 let win: BrowserWindow = null;
+let watcher: chokidar.FSWatcher = null;
+let currentData = 0;
+
 const args = process.argv.slice(1),
   serve = args.some(val => val === '--serve');
+
+menu();
 
 function createWindow(): BrowserWindow {
 
@@ -19,12 +26,12 @@ function createWindow(): BrowserWindow {
     width: size.width,
     height: size.height,
     webPreferences: {
+
       nodeIntegration: true,
       allowRunningInsecureContent: (serve) ? true : false,
       contextIsolation: false,  // false if you want to run e2e test with Spectron
     },
   });
-
 
   if (serve) {
     win.webContents.openDevTools();
@@ -86,4 +93,46 @@ try {
 } catch (e) {
   // Catch Error
   // throw e;
+}
+
+
+ipcMain.on('ipc-test', (event, args) => {
+  const result = dialog.showOpenDialogSync({ properties: ['openFile', 'multiSelections'] });
+  // dialog.showMessageBox({message: JSON.stringify(result)});
+  event.sender.send('ipc-test-replay', result);
+  getFileData(result[0], event);
+  setupWatch(result[0], event);
+});
+
+function getFileData(filename: string, event: any) {
+  try {
+    const tempData = fs.readFileSync(filename, 'utf8');
+    if (tempData.length == 0) { return; }
+    if (currentData > tempData.length) {
+      currentData = 0;
+      event.sender.send('ipc-receive-debug', ['reset', currentData, tempData.length]);
+    }
+    if (tempData.length !== currentData) {
+      event.sender.send('ipc-receive-debug', [tempData.length, currentData]);
+      event.sender.send('ipc-receive-data', tempData.substring(currentData));
+      currentData = tempData.length;
+    }
+  } catch (err) {
+    return '';
+  }
+}
+
+function setupWatch(file: string, event: any) {
+  if (typeof watcher !== 'undefined' && watcher !== null) { watcher.close(); }
+
+  var watcher = chokidar.watch(file, {
+    persistent: true
+  });
+
+  watcher.on('raw', (fileevent, path, details) => {
+    // This event should be triggered everytime something happens.
+    getFileData(file, event);
+    event.sender.send('ipc-receive-debug', ['Raw event info:', fileevent, path, details]);
+
+  });
 }

@@ -24,9 +24,18 @@ module.exports = (config, options) => {
     config.plugins = [
         ...config.plugins,
         new NodePolyfillPlugin({
-			excludeAliases: ["console"]
-		})
+          excludeAliases: ["console"]
+        })
     ];
+
+    config.resolve = {
+      ...config.resolve,
+      fallback: {
+        "fs": false,
+        "path": false,
+        "os": false,
+      }
+    }
 
     return config;
 }
