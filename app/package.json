@@ -3,5 +3,7 @@
   "version": "10.4.0",
   "main": "main.js",
   "private": true,
-  "dependencies": {}
+  "dependencies": {
+    "chokidar": "3.5.3"
+  }
 }

@@ -14,7 +14,7 @@ export class HomeComponent implements OnInit, AfterViewInit  {
   @ViewChild('editor') private editor: ElementRef<HTMLElement>;
   ngAfterViewInit(): void {
     ace.config.set('fontSize', '14px');
-    ace.config.set('basePath', '/assets/ace-editor/');
+    ace.config.set('basePath', './assets/ace-editor/');
 
     this.aceEditor = ace.edit(this.editor.nativeElement);
 

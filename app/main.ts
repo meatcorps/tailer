@@ -26,9 +26,9 @@ function createWindow(): BrowserWindow {
     width: size.width,
     height: size.height,
     webPreferences: {
-
+      webSecurity: false,
       nodeIntegration: true,
-      allowRunningInsecureContent: (serve) ? true : false,
+      allowRunningInsecureContent: true,
       contextIsolation: false,  // false if you want to run e2e test with Spectron
     },
   });
