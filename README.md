@@ -1,5 +1,7 @@
 # Tailer
 
+![Screenshot](https://meatcorps.github.io/tailer/screenshot.png)
+
 ![Maintained][maintained-badge]
 [![Make a pull request][prs-badge]][prs]
 [![License][license-badge]](LICENSE.md)
