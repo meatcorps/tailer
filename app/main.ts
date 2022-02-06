@@ -1,9 +1,10 @@
-import { app, BrowserWindow, screen, dialog, ipcMain } from 'electron';
+import { app, BrowserWindow, screen, dialog, ipcMain, globalShortcut } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as url from 'url';
 import * as chokidar from 'chokidar';
 import { menu } from './menu';
+
 
 let win: BrowserWindow = null;
 let watcher: chokidar.FSWatcher = null;
@@ -32,6 +33,17 @@ function createWindow(): BrowserWindow {
       contextIsolation: false,  // false if you want to run e2e test with Spectron
     },
   });
+
+  win.on('focus', (event) => {
+    globalShortcut.register('CommandOrControl+R', () => {});
+    globalShortcut.register('CommandOrControl+Shift+R', () => {});
+    globalShortcut.register('F5', () => {});
+
+  });
+
+  win.on('blur', (event) => {
+    globalShortcut.unregisterAll();
+  })
 
   if (serve) {
     win.webContents.openDevTools();

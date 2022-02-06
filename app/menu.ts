@@ -30,8 +30,6 @@ export function menu() {
         {
           label: 'View',
           submenu: [
-            { role: 'reload' },
-            { role: 'forceReload' },
             { role: 'toggleDevTools' },
             { type: 'separator' },
             { role: 'resetZoom' },
@@ -57,7 +55,7 @@ export function menu() {
               label: 'Learn More',
               click: async () => {
                 const { shell } = require('electron')
-                await shell.openExternal('https://electronjs.org')
+                await shell.openExternal('https://meatcorps.github.io/tailer/')
               }
             }
           ]
