@@ -13,6 +13,7 @@ export class HomeComponent implements OnInit, AfterViewInit  {
   @ViewChild('editor') private editor: ElementRef<HTMLElement>;
 
   public code = '';
+  public bottomNotice = 0;
 
   private aceEditor: ace.Ace.Editor = null;
 
@@ -71,14 +72,21 @@ export class HomeComponent implements OnInit, AfterViewInit  {
 
     this.electronService.ipcRenderer.on('ipc-receive-data', (event, arg) => {
       const toAdd: string = arg;
-      this.aceEditor.session.insert({
-        row: this.aceEditor.session.getLength(),
-        column: 0
-      }, toAdd);
 
-      if (this.isCurrentlyScrolledAtBottom()) {
-        this.aceEditor.renderer.scrollToLine(Number.POSITIVE_INFINITY, false, true, () => {});
-      }
+      const needToScroll = this.isCurrentlyScrolledAtBottom();
+
+      setTimeout(() => {
+        this.aceEditor.session.insert({
+          row: this.aceEditor.session.getLength(),
+          column: 0
+        }, toAdd);
+
+        if (needToScroll) {
+          this.aceEditor.renderer.scrollToLine(Number.POSITIVE_INFINITY, false, true, () => {});
+        } else {
+          this.bottomNotice = 1;
+        }
+      }, 10);
     });
 
     this.electronService.ipcRenderer.send('ipc-request-args');
@@ -91,7 +99,7 @@ export class HomeComponent implements OnInit, AfterViewInit  {
       }
     });
 
-    // setInterval(() => this.debugLines(), 2000);
+    setInterval(() => this.updateBottomNotice(), 100);
   }
 
   private debugLines() {
@@ -105,13 +113,19 @@ export class HomeComponent implements OnInit, AfterViewInit  {
   private isCurrentlyScrolledAtBottom() {
     const currentPosition = this.aceEditor.renderer['scrollBarV'].scrollHeight;
     if (this.aceEditor.renderer['$size'].height >= currentPosition) {
-      console.log('SKIP', currentPosition, this.aceEditor.renderer['$size'].height);
       return true;
     }
-    const totalPosition = this.aceEditor.renderer['scrollBarV'].scrollTop + this.aceEditor.renderer['$size'].height - 10;
+    const totalPosition = this.aceEditor.renderer['scrollBarV'].scrollTop + this.aceEditor.renderer['$size'].height + 50;
 
     console.log('NOTSKIP', currentPosition, totalPosition);
     return currentPosition <= totalPosition;
+  }
+
+  private updateBottomNotice() {
+    this.bottomNotice -= 0.05;
+    if (this.bottomNotice < 0) {
+      this.bottomNotice = 0;
+    }
   }
 
   private getLogRules(): any {
