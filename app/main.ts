@@ -106,6 +106,10 @@ ipcMain.on('ipc-request-args', (event, args) => {
   mainEvent.sender.send('ipc-arguments', publicArgs);
 });
 
+ipcMain.on('ipc-server-trigger-find', (event, args) => {
+  mainEvent.sender.send('ipc-trigger-find');
+});
+
 ipcMain.on('ipc-test', (event, args) => {
   if ((typeof args === 'string' && args.length > 0 && fs.existsSync(args))) {
     mainEvent.sender.send('ipc-receive-debug', ['precheck', fs.existsSync(args)]);

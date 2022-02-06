@@ -61,7 +61,13 @@ function menu() {
             label: 'Edit',
             submenu: [
                 {
-                    label: 'find'
+                    label: 'find',
+                    click: function () { return __awaiter(_this, void 0, void 0, function () {
+                        return __generator(this, function (_a) {
+                            require('electron').ipcMain.emit('ipc-server-trigger-find');
+                            return [2 /*return*/];
+                        });
+                    }); }
                 }
             ]
         },

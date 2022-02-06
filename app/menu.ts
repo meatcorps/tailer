@@ -5,7 +5,7 @@ export function menu() {
         {
           label: 'File',
           submenu: [
-            { 
+            {
                 label: 'Open',
                 click: async () => {
                     require('electron').ipcMain.emit('ipc-test')
@@ -18,8 +18,11 @@ export function menu() {
         {
           label: 'Edit',
           submenu: [
-            { 
-                label: 'find'
+            {
+                label: 'Find',
+                click: async () => {
+                  require('electron').ipcMain.emit('ipc-server-trigger-find')
+                }
             }
           ]
         },
@@ -60,7 +63,7 @@ export function menu() {
           ]
         }
       ]
-      
+
       const menu = Menu.buildFromTemplate(template)
       Menu.setApplicationMenu(menu)
 }

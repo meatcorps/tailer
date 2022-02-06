@@ -63,6 +63,11 @@ export class HomeComponent implements OnInit, AfterViewInit  {
       document.title = arg + ' - Tailer';
     });
 
+    this.electronService.ipcRenderer.on('ipc-trigger-find', (event, arg) => {
+      console.log('trigger find');
+      this.aceEditor.execCommand('find');
+    });
+
     this.electronService.ipcRenderer.on('ipc-receive-data', (event, arg) => {
       const toAdd: string = arg;
       this.aceEditor.session.insert({
