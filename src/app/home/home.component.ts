@@ -54,8 +54,13 @@ export class HomeComponent implements OnInit, AfterViewInit  {
     this.electronService.ipcRenderer.on('ipc-receive-debug', (event, arg) => {
       console.log('debug', arg);
     });
+
     this.electronService.ipcRenderer.on('ipc-receive-resetdata', (event, arg) => {
       this.aceEditor.session.setValue('');
+    });
+
+    this.electronService.ipcRenderer.on('ipc-opening-file', (event, arg) => {
+      document.title = arg + ' - Tailer';
     });
 
     this.electronService.ipcRenderer.on('ipc-receive-data', (event, arg) => {
@@ -65,6 +70,16 @@ export class HomeComponent implements OnInit, AfterViewInit  {
         column: 0
       }, toAdd);
       this.aceEditor.renderer.scrollToLine(Number.POSITIVE_INFINITY, false, true, () => {});
+    });
+
+    this.electronService.ipcRenderer.send('ipc-request-args');
+
+    this.electronService.ipcRenderer.on('ipc-arguments', (event, args) => {
+      console.log('incoming args', args);
+      if (args.length === 1 && args[0].indexOf(':\\') > -1) {
+        this.electronService.ipcRenderer.send('ipc-test', args[0]);
+        console.log('trying to open', args[0]);
+      }
     });
   }
 

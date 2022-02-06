@@ -9,8 +9,8 @@ let win: BrowserWindow = null;
 let watcher: chokidar.FSWatcher = null;
 let currentData = 0;
 
-const args = process.argv.slice(1),
-  serve = args.some(val => val === '--serve');
+const publicArgs = process.argv.slice(1),
+  serve = publicArgs.some(val => val === '--serve');
 
 menu();
 
@@ -99,15 +99,23 @@ let mainEvent = null;
 
 ipcMain.on('ipc-setup', (event, args) => {
   mainEvent = event;
+  mainEvent.sender.send('ipc-ready-from-main');
+});
+
+ipcMain.on('ipc-request-args', (event, args) => {
+  mainEvent.sender.send('ipc-arguments', publicArgs);
 });
 
 ipcMain.on('ipc-test', (event, args) => {
-  const result = dialog.showOpenDialogSync({ properties: ['openFile', 'multiSelections'] });
-  // dialog.showMessageBox({message: JSON.stringify(result)});
-  //event.sender.send
+  if ((typeof args === 'string' && args.length > 0 && fs.existsSync(args))) {
+    mainEvent.sender.send('ipc-receive-debug', ['precheck', fs.existsSync(args)]);
+  }
+  const result = (typeof args === 'string' && args.length > 0 && fs.existsSync(args)) ? [args] : dialog.showOpenDialogSync({ properties: ['openFile'] });
+
   mainEvent.sender.send('ipc-test-replay', result);
   mainEvent.sender.send('ipc-receive-resetdata', '');
   mainEvent.sender.send('ipc-receive-debug', ['setup', result[0]]);
+  mainEvent.sender.send('ipc-opening-file', result[0]);
   currentData = 0;
   getFileData(result[0], event);
   setupWatch(result[0], event);
