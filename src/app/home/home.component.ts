@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/dot-notation */
 import {Component, ElementRef, OnInit, ViewChild, AfterViewInit} from '@angular/core';
 import { Router } from '@angular/router';
 import * as ace from 'ace-builds';
@@ -74,7 +75,10 @@ export class HomeComponent implements OnInit, AfterViewInit  {
         row: this.aceEditor.session.getLength(),
         column: 0
       }, toAdd);
-      this.aceEditor.renderer.scrollToLine(Number.POSITIVE_INFINITY, false, true, () => {});
+
+      if (this.isCurrentlyScrolledAtBottom()) {
+        this.aceEditor.renderer.scrollToLine(Number.POSITIVE_INFINITY, false, true, () => {});
+      }
     });
 
     this.electronService.ipcRenderer.send('ipc-request-args');
@@ -86,6 +90,28 @@ export class HomeComponent implements OnInit, AfterViewInit  {
         console.log('trying to open', args[0]);
       }
     });
+
+    // setInterval(() => this.debugLines(), 2000);
+  }
+
+  private debugLines() {
+    console.log(
+      this.aceEditor.renderer['$size'].height,
+      this.aceEditor.renderer['scrollBarV'].scrollHeight,
+      this.aceEditor.renderer['scrollBarV'].scrollTop + this.aceEditor.renderer['$size'].height
+    );
+  }
+
+  private isCurrentlyScrolledAtBottom() {
+    const currentPosition = this.aceEditor.renderer['scrollBarV'].scrollHeight;
+    if (this.aceEditor.renderer['$size'].height >= currentPosition) {
+      console.log('SKIP', currentPosition, this.aceEditor.renderer['$size'].height);
+      return true;
+    }
+    const totalPosition = this.aceEditor.renderer['scrollBarV'].scrollTop + this.aceEditor.renderer['$size'].height - 10;
+
+    console.log('NOTSKIP', currentPosition, totalPosition);
+    return currentPosition <= totalPosition;
   }
 
   private getLogRules(): any {

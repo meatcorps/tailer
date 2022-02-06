@@ -127,7 +127,7 @@ ipcMain.on('ipc-test', (event, args) => {
 
 function getFileData(filename: string, event: any) {
   try {
-    const tempData = fs.readFileSync(filename, 'utf8');
+    const tempData = fs.readFileSync(filename).toString(); // 'utf8'
     if (tempData.length == 0) { return; }
     if (currentData > tempData.length) {
       currentData = 0;
