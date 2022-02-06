@@ -28,7 +28,7 @@ export class ElectronService {
       this.childProcess = window.require('child_process');
       this.fs = window.require('fs');
 
-      this.ipcRenderer.send('ipc-setup', ['whatever'])
+      this.ipcRenderer.send('ipc-setup', ['whatever']);
 
       // Notes :
       // * A NodeJS's dependency imported with 'window.require' MUST BE present in `dependencies` of both `app/package.json`

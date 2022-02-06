@@ -9,10 +9,13 @@ import { ElectronService } from '../core/services';
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit, AfterViewInit  {
+  @ViewChild('editor') private editor: ElementRef<HTMLElement>;
+
+  public code = '';
+
   private aceEditor: ace.Ace.Editor = null;
 
-  @ViewChild('editor') private editor: ElementRef<HTMLElement>;
-  ngAfterViewInit(): void {
+  public ngAfterViewInit(): void {
     ace.config.set('fontSize', '14px');
     ace.config.set('basePath', './assets/ace-editor/');
 
@@ -42,9 +45,6 @@ export class HomeComponent implements OnInit, AfterViewInit  {
   }
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
-  public code = '';
-
-  // eslint-disable-next-line @typescript-eslint/member-ordering
   constructor(private router: Router, private electronService: ElectronService) {
   }
 
@@ -57,11 +57,9 @@ export class HomeComponent implements OnInit, AfterViewInit  {
     this.electronService.ipcRenderer.on('ipc-receive-resetdata', (event, arg) => {
       this.aceEditor.session.setValue('');
     });
-    
+
     this.electronService.ipcRenderer.on('ipc-receive-data', (event, arg) => {
-      // this.aceEditor.session.setValue(arg);
-      let toAdd: string = arg;
-      // toAdd = toAdd.substring(this.aceEditor.session.getLength()); 
+      const toAdd: string = arg;
       this.aceEditor.session.insert({
         row: this.aceEditor.session.getLength(),
         column: 0

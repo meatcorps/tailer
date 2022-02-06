@@ -134,7 +134,7 @@ function getFileData(filename: string, event: any) {
 function setupWatch(file: string, event: any) {
   if (typeof watcher !== 'undefined' && watcher !== null) { watcher.close(); }
 
-  var watcher = chokidar.watch(file, {
+  watcher = chokidar.watch(file, {
     persistent: true
   });
 
