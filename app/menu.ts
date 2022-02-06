@@ -5,7 +5,7 @@ export function menu() {
         {
           label: 'File',
           submenu: [
-            { 
+            {
                 label: 'Open',
                 click: async () => {
                     require('electron').ipcMain.emit('ipc-test')
@@ -18,8 +18,11 @@ export function menu() {
         {
           label: 'Edit',
           submenu: [
-            { 
-                label: 'find'
+            {
+                label: 'Find',
+                click: async () => {
+                  require('electron').ipcMain.emit('ipc-server-trigger-find')
+                }
             }
           ]
         },
@@ -27,8 +30,6 @@ export function menu() {
         {
           label: 'View',
           submenu: [
-            { role: 'reload' },
-            { role: 'forceReload' },
             { role: 'toggleDevTools' },
             { type: 'separator' },
             { role: 'resetZoom' },
@@ -54,13 +55,13 @@ export function menu() {
               label: 'Learn More',
               click: async () => {
                 const { shell } = require('electron')
-                await shell.openExternal('https://electronjs.org')
+                await shell.openExternal('https://meatcorps.github.io/tailer/')
               }
             }
           ]
         }
       ]
-      
+
       const menu = Menu.buildFromTemplate(template)
       Menu.setApplicationMenu(menu)
 }

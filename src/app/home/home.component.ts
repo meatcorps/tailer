@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/dot-notation */
 import {Component, ElementRef, OnInit, ViewChild, AfterViewInit} from '@angular/core';
 import { Router } from '@angular/router';
 import * as ace from 'ace-builds';
@@ -12,6 +13,7 @@ export class HomeComponent implements OnInit, AfterViewInit  {
   @ViewChild('editor') private editor: ElementRef<HTMLElement>;
 
   public code = '';
+  public bottomNotice = 0;
 
   private aceEditor: ace.Ace.Editor = null;
 
@@ -54,18 +56,76 @@ export class HomeComponent implements OnInit, AfterViewInit  {
     this.electronService.ipcRenderer.on('ipc-receive-debug', (event, arg) => {
       console.log('debug', arg);
     });
+
     this.electronService.ipcRenderer.on('ipc-receive-resetdata', (event, arg) => {
       this.aceEditor.session.setValue('');
     });
 
+    this.electronService.ipcRenderer.on('ipc-opening-file', (event, arg) => {
+      document.title = arg + ' - Tailer';
+    });
+
+    this.electronService.ipcRenderer.on('ipc-trigger-find', (event, arg) => {
+      console.log('trigger find');
+      this.aceEditor.execCommand('find');
+    });
+
     this.electronService.ipcRenderer.on('ipc-receive-data', (event, arg) => {
       const toAdd: string = arg;
-      this.aceEditor.session.insert({
-        row: this.aceEditor.session.getLength(),
-        column: 0
-      }, toAdd);
-      this.aceEditor.renderer.scrollToLine(Number.POSITIVE_INFINITY, false, true, () => {});
+
+      const needToScroll = this.isCurrentlyScrolledAtBottom();
+
+      setTimeout(() => {
+        this.aceEditor.session.insert({
+          row: this.aceEditor.session.getLength(),
+          column: 0
+        }, toAdd);
+
+        if (needToScroll) {
+          this.aceEditor.renderer.scrollToLine(Number.POSITIVE_INFINITY, false, true, () => {});
+        } else {
+          this.bottomNotice = 1;
+        }
+      }, 10);
     });
+
+    this.electronService.ipcRenderer.send('ipc-request-args');
+
+    this.electronService.ipcRenderer.on('ipc-arguments', (event, args) => {
+      console.log('incoming args', args);
+      if (args.length === 1 && args[0].indexOf(':\\') > -1) {
+        this.electronService.ipcRenderer.send('ipc-test', args[0]);
+        console.log('trying to open', args[0]);
+      }
+    });
+
+    setInterval(() => this.updateBottomNotice(), 100);
+  }
+
+  private debugLines() {
+    console.log(
+      this.aceEditor.renderer['$size'].height,
+      this.aceEditor.renderer['scrollBarV'].scrollHeight,
+      this.aceEditor.renderer['scrollBarV'].scrollTop + this.aceEditor.renderer['$size'].height
+    );
+  }
+
+  private isCurrentlyScrolledAtBottom() {
+    const currentPosition = this.aceEditor.renderer['scrollBarV'].scrollHeight;
+    if (this.aceEditor.renderer['$size'].height >= currentPosition) {
+      return true;
+    }
+    const totalPosition = this.aceEditor.renderer['scrollBarV'].scrollTop + this.aceEditor.renderer['$size'].height + 50;
+
+    console.log('NOTSKIP', currentPosition, totalPosition);
+    return currentPosition <= totalPosition;
+  }
+
+  private updateBottomNotice() {
+    this.bottomNotice -= 0.05;
+    if (this.bottomNotice < 0) {
+      this.bottomNotice = 0;
+    }
   }
 
   private getLogRules(): any {

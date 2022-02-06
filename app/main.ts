@@ -1,16 +1,17 @@
-import { app, BrowserWindow, screen, dialog, ipcMain } from 'electron';
+import { app, BrowserWindow, screen, dialog, ipcMain, globalShortcut } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as url from 'url';
 import * as chokidar from 'chokidar';
 import { menu } from './menu';
 
+
 let win: BrowserWindow = null;
 let watcher: chokidar.FSWatcher = null;
 let currentData = 0;
 
-const args = process.argv.slice(1),
-  serve = args.some(val => val === '--serve');
+const publicArgs = process.argv.slice(1),
+  serve = publicArgs.some(val => val === '--serve');
 
 menu();
 
@@ -32,6 +33,17 @@ function createWindow(): BrowserWindow {
       contextIsolation: false,  // false if you want to run e2e test with Spectron
     },
   });
+
+  win.on('focus', (event) => {
+    globalShortcut.register('CommandOrControl+R', () => {});
+    globalShortcut.register('CommandOrControl+Shift+R', () => {});
+    globalShortcut.register('F5', () => {});
+
+  });
+
+  win.on('blur', (event) => {
+    globalShortcut.unregisterAll();
+  })
 
   if (serve) {
     win.webContents.openDevTools();
@@ -99,15 +111,27 @@ let mainEvent = null;
 
 ipcMain.on('ipc-setup', (event, args) => {
   mainEvent = event;
+  mainEvent.sender.send('ipc-ready-from-main');
+});
+
+ipcMain.on('ipc-request-args', (event, args) => {
+  mainEvent.sender.send('ipc-arguments', publicArgs);
+});
+
+ipcMain.on('ipc-server-trigger-find', (event, args) => {
+  mainEvent.sender.send('ipc-trigger-find');
 });
 
 ipcMain.on('ipc-test', (event, args) => {
-  const result = dialog.showOpenDialogSync({ properties: ['openFile', 'multiSelections'] });
-  // dialog.showMessageBox({message: JSON.stringify(result)});
-  //event.sender.send
+  if ((typeof args === 'string' && args.length > 0 && fs.existsSync(args))) {
+    mainEvent.sender.send('ipc-receive-debug', ['precheck', fs.existsSync(args)]);
+  }
+  const result = (typeof args === 'string' && args.length > 0 && fs.existsSync(args)) ? [args] : dialog.showOpenDialogSync({ properties: ['openFile'] });
+
   mainEvent.sender.send('ipc-test-replay', result);
   mainEvent.sender.send('ipc-receive-resetdata', '');
   mainEvent.sender.send('ipc-receive-debug', ['setup', result[0]]);
+  mainEvent.sender.send('ipc-opening-file', result[0]);
   currentData = 0;
   getFileData(result[0], event);
   setupWatch(result[0], event);
@@ -115,7 +139,7 @@ ipcMain.on('ipc-test', (event, args) => {
 
 function getFileData(filename: string, event: any) {
   try {
-    const tempData = fs.readFileSync(filename, 'utf8');
+    const tempData = fs.readFileSync(filename).toString(); // 'utf8'
     if (tempData.length == 0) { return; }
     if (currentData > tempData.length) {
       currentData = 0;
