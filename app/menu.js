@@ -75,8 +75,6 @@ function menu() {
         {
             label: 'View',
             submenu: [
-                { role: 'reload' },
-                { role: 'forceReload' },
                 { role: 'toggleDevTools' },
                 { type: 'separator' },
                 { role: 'resetZoom' },
@@ -106,7 +104,7 @@ function menu() {
                             switch (_a.label) {
                                 case 0:
                                     shell = require('electron').shell;
-                                    return [4 /*yield*/, shell.openExternal('https://electronjs.org')];
+                                    return [4 /*yield*/, shell.openExternal('https://meatcorps.github.io/tailer/')];
                                 case 1:
                                     _a.sent();
                                     return [2 /*return*/];
