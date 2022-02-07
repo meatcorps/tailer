@@ -159,7 +159,8 @@ function setupWatch(file: string, event: any) {
   if (typeof watcher !== 'undefined' && watcher !== null) { watcher.close(); }
 
   watcher = chokidar.watch(file, {
-    persistent: true
+    persistent: true,
+    usePolling: true
   });
 
   watcher.on('raw', (fileevent, path, details) => {
