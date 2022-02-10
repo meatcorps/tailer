@@ -5,9 +5,12 @@ import { HomeRoutingModule } from './home-routing.module';
 
 import { HomeComponent } from './home.component';
 import { SharedModule } from '../shared/shared.module';
+import {
+  SyntaxHighlighterWrapperComponent
+} from '../components/syntax-highlighter-wrapper/syntax-highlighter-wrapper.component';
 
 @NgModule({
-  declarations: [HomeComponent],
+  declarations: [HomeComponent, SyntaxHighlighterWrapperComponent],
     imports: [CommonModule, SharedModule, HomeRoutingModule]
 })
 export class HomeModule {}
