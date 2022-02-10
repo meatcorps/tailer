@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { ElectronService } from '../core/services';
 import {
   SyntaxHighlighterWrapperConfiguration
-} from '../components/syntax-highlighter-wrapper/syntax-highlighter-wrapper-configuration';
+} from '../shared/components/syntax-highlighter-wrapper/syntax-highlighter-wrapper-configuration';
 
 @Component({
   selector: 'app-home',

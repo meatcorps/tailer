@@ -7,7 +7,7 @@ import { HomeComponent } from './home.component';
 import { SharedModule } from '../shared/shared.module';
 import {
   SyntaxHighlighterWrapperComponent
-} from '../components/syntax-highlighter-wrapper/syntax-highlighter-wrapper.component';
+} from '../shared/components/syntax-highlighter-wrapper/syntax-highlighter-wrapper.component';
 
 @NgModule({
   declarations: [HomeComponent, SyntaxHighlighterWrapperComponent],
