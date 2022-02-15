@@ -8,7 +8,7 @@ export function menu() {
             {
                 label: 'Open',
                 click: async () => {
-                    require('electron').ipcMain.emit('ipc-test')
+                    require('electron').ipcMain.emit('ipc-client-request-open-file')
                 }
             },
             { role: 'quit' }

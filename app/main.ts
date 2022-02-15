@@ -5,7 +5,6 @@ import * as url from 'url';
 import * as chokidar from 'chokidar';
 import { menu } from './menu';
 
-
 let win: BrowserWindow = null;
 let watcher: chokidar.FSWatcher = null;
 let currentData = 0;
@@ -16,9 +15,7 @@ const publicArgs = process.argv.slice(1),
 menu();
 
 function createWindow(): BrowserWindow {
-
-  const electronScreen = screen;
-  const size = electronScreen.getPrimaryDisplay().workAreaSize;
+  const size = screen.getPrimaryDisplay().workAreaSize;
 
   // Create the browser window.
   win = new BrowserWindow({
@@ -38,7 +35,6 @@ function createWindow(): BrowserWindow {
     globalShortcut.register('CommandOrControl+R', () => {});
     globalShortcut.register('CommandOrControl+Shift+R', () => {});
     globalShortcut.register('F5', () => {});
-
   });
 
   win.on('blur', (event) => {
@@ -122,7 +118,7 @@ ipcMain.on('ipc-server-trigger-find', (event, args) => {
   mainEvent.sender.send('ipc-trigger-find');
 });
 
-ipcMain.on('ipc-test', (event, args) => {
+ipcMain.on('ipc-client-request-open-file', (event, args) => {
   if ((typeof args === 'string' && args.length > 0 && fs.existsSync(args))) {
     mainEvent.sender.send('ipc-receive-debug', ['precheck', fs.existsSync(args)]);
   }

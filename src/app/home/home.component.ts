@@ -1,11 +1,12 @@
 // noinspection JSUnusedLocalSymbols
 
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ElectronService } from '../core/services';
 import {
   SyntaxHighlighterWrapperConfiguration
 } from '../shared/components/syntax-highlighter-wrapper/syntax-highlighter-wrapper-configuration';
+import {BackendApiService} from '../shared/services/backend-api.service';
 
 @Component({
   selector: 'app-home',
@@ -17,48 +18,28 @@ export class HomeComponent implements OnInit  {
   public bottomNotice = 0;
   public syntaxEditorConfiguration: SyntaxHighlighterWrapperConfiguration = new SyntaxHighlighterWrapperConfiguration();
 
-  // eslint-disable-next-line @typescript-eslint/member-ordering
-  constructor(private router: Router, private electronService: ElectronService) {
+  constructor(private router: Router, private backendApi: BackendApiService) {
   }
 
   ngOnInit(): void {
-    this.electronService.ipcRenderer.send('ipc-request-args');
-
-    this.electronService.ipcRenderer.on('ipc-receive-debug', (event, arg) => {
-      console.log('debug', arg);
-    });
-
-    this.electronService.ipcRenderer.on('ipc-receive-resetdata', (event, arg) => {
-      this.syntaxEditorConfiguration.update('');
-    });
-
-    this.electronService.ipcRenderer.on('ipc-opening-file', (event, arg) => {
-      document.title = arg + ' - Tailer';
-    });
-
-    this.electronService.ipcRenderer.on('ipc-trigger-find', (event, arg) => {
-
-      this.syntaxEditorConfiguration.executeCommand('find');
-    });
-
-    this.electronService.ipcRenderer.on('ipc-receive-data', (event, arg) => this.syntaxEditorConfiguration.insert(arg));
-
-
-    this.electronService.ipcRenderer.on('ipc-arguments', (event, args) => {
-      console.log('incoming args', args);
-      if (args.length === 1 && args[0].indexOf(':\\') > -1) {
-        this.electronService.ipcRenderer.send('ipc-test', args[0]);
-        console.log('trying to open', args[0]);
-      }
-    });
-
-    this.syntaxEditorConfiguration.on('onChange').subscribe(() => {
-      if (this.syntaxEditorConfiguration.getSetting('needToScroll', true)) {
-        this.bottomNotice = 1;
-      }
-    });
-
+    this.backendApi.onBackendResetRequest.subscribe(() => this.syntaxEditorConfiguration.update(''));
+    this.backendApi.onOpeningFile.subscribe((path) => document.title = path + ' - Tailer');
+    this.backendApi.onFindClickedInMenu.subscribe(() => this.syntaxEditorConfiguration.executeCommand('find'));
+    this.backendApi.onReceiveNewData.subscribe((newData: string) => this.syntaxEditorConfiguration.insert(newData));
+    this.backendApi.requestForArguments().subscribe((args: string) => this.needToOpenCheck(args));
+    this.syntaxEditorConfiguration.on('onChange').subscribe(() => this.checkForScroll());
     setInterval(() => this.updateBottomNotice(), 100);
+  }
+
+  private needToOpenCheck(args: string) {
+    if (!(args.length === 1 && args[0].indexOf('\\') > -1)) { return; }
+    this.backendApi.openFileStream(args[0]);
+    console.log('trying to open', args[0]);
+  }
+
+  private checkForScroll() {
+    if (!this.syntaxEditorConfiguration.getSetting('needToScroll', true)) { return; }
+    this.bottomNotice = 1;
   }
 
   private updateBottomNotice() {
