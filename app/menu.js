@@ -48,7 +48,7 @@ function menu() {
                     label: 'Open',
                     click: function () { return __awaiter(_this, void 0, void 0, function () {
                         return __generator(this, function (_a) {
-                            require('electron').ipcMain.emit('ipc-test');
+                            require('electron').ipcMain.emit('ipc-client-request-open-file');
                             return [2 /*return*/];
                         });
                     }); }

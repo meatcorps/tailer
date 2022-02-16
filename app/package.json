@@ -4,6 +4,8 @@
   "main": "main.js",
   "private": true,
   "dependencies": {
-    "chokidar": "3.5.3"
+    "chokidar": "3.5.3",
+    "rxjs": "^7.5.4",
+    "typedi": "^0.10.0"
   }
 }
