@@ -27,7 +27,7 @@ export class BackendApiService {
   }
 
   public get onFindClickedInMenu(): Observable<void> {
-    return this.getSubscriberFromElectronBackend('ipc-trigger-find');
+    return this.getSubscriberFromElectronBackend('ipc-server-trigger-find');
   }
 
   public get onReceiveNewData(): Observable<string> {

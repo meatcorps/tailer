@@ -1,10 +1,13 @@
-import { app, BrowserWindow } from 'electron';
-import {Observable, Subject} from 'rxjs';
-import {IStartable} from "./IStartable";
+import { app } from 'electron';
+import { Observable, Subject } from 'rxjs';
+import { IStartable } from "./i-startable";
+import { Service } from 'typedi';
+import {WindowItem} from "./window";
 
+@Service()
 export class MainApp implements IStartable {
   private readonly app: typeof app;
-  private win: BrowserWindow = null;
+  private windows: WindowItem[] = [];
   private onCreateWindowSubject: Subject<MainApp> = new Subject<MainApp>();
   private onStartSubject: Subject<MainApp> = new Subject<MainApp>();
   private onErrorSubject: Subject<any> = new Subject<any>();
@@ -14,9 +17,17 @@ export class MainApp implements IStartable {
   public get onStart():Observable<MainApp> {return this.onStartSubject.asObservable(); };
   public get onError():Observable<any> {return this.onErrorSubject.asObservable(); };
   public get onClosed():Observable<MainApp> {return this.onClosedSubject.asObservable(); };
+
   public get electronApp(): typeof app { return this.app; }
-  public get primaryWindow(): BrowserWindow { return this.win; }
-  public set primaryWindow(win: BrowserWindow) { this.win = win; }
+
+  public GetAllWindows(): WindowItem[] { return this.windows; }
+
+  public AddWindow(window: WindowItem) {
+    this.windows.push(window);
+    window.onClose.subscribe(() =>
+      this.windows.splice(this.windows.indexOf(window), 1)
+    );
+  }
 
   constructor() {
     this.app = app;
@@ -36,7 +47,7 @@ export class MainApp implements IStartable {
   private activate() {
     // On OS X it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
-    if (this.win === null) {
+    if (this.windows.length === 0) {
       this.onCreateWindowSubject.next(this);
     }
   }
