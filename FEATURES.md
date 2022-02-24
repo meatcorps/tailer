@@ -1,12 +1,11 @@
 # Feature wanted for release
 
-- REFACTOR!!!! Smells like a quick weekend code in here
-- Cleanup backend code
-- Cleanup frontend code
-  - Move Ace logic to own component
-  - Service for all backend bindings
-  - Central service for current document
 - System to analyze log entry for filtering etc
+- Make syntax highlight configuratable
+  - Fase 1: Config file on the side.
+  - Fase 2: Config editor for Tailer
+- Tab support with multiple files
+- Latest open files    
 
 # Features done
 
@@ -15,3 +14,9 @@
 - Syntax highlight log4net
 - Load file by file dialog
 - Load file by arguments
+- REFACTOR!!!! Smells like a quick weekend code in here
+- Cleanup backend code
+- Cleanup frontend code
+  - Move Ace logic to own component
+  - Service for all backend bindings
+  - Central service for current document
