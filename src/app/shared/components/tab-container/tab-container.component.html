@@ -1,0 +1,11 @@
+<div class="scroll-tab-container" #tabTarget>
+  <ul class="tab-container" [style.margin-left]="-offset + 'px'">
+    <li *ngFor="let tabName of tabs" (click)="configuration.setActive(tabName)"  [class.active]="tabName === this.activeTab" [title]="tabName">
+      {{configuration.convert(tabName)}}
+      <a href="javascript: void(0);" class="remove" (click)="configuration.remove(tabName)">x</a>
+      <span class="identifier" [style.opacity]="configuration.tabIdentifyNumber(tabName) / 100"></span>
+    </li>
+  </ul>
+</div>
+<div class="scrolltoleft button" (click)="scrollToLeft()" [class.hide]="!needToScroll" [class.disabled]="!canScrollLeft()"><</div>
+<div class="scrolltoright button" (click)="scrollToRight()" [class.hide]="!needToScroll" [class.disabled]="!canScrollRight()">></div>

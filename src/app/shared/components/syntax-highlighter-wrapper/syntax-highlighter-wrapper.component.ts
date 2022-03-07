@@ -82,8 +82,19 @@ export class SyntaxHighlighterWrapperComponent implements OnInit, AfterViewInit 
 
 
   private updateCode(code: string) {
-    this.aceEditor.session.setValue(code);
-    this.configuration.invokeOnChange();
+    const needToScroll = this.isCurrentlyScrolledAtBottom();
+    setTimeout(() => {
+      this.aceEditor.session.setValue(code);
+
+      this.configuration.setSetting('needToScroll', needToScroll);
+
+      if (needToScroll) {
+        this.aceEditor.renderer.scrollToLine(Number.POSITIVE_INFINITY, false, true, () => {
+        });
+      }
+
+      this.configuration.invokeOnChange();
+    }, 10);
   }
 
   private isCurrentlyScrolledAtBottom() {

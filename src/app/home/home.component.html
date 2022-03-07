@@ -1,6 +1,7 @@
 <div appDnd (fileDropped)="fileDropped($event)">
-  <app-syntax-highlighter-wrapper [configuration]="syntaxEditorConfiguration"></app-syntax-highlighter-wrapper>
-  <div id="glow" [style.opacity]="bottomNotice"></div>
+  <app-tab-container [configuration]="tabContainerConfiguration"></app-tab-container>
+  <app-syntax-highlighter-wrapper [configuration]="syntaxEditorConfiguration" [style.visibility]="tabContainerConfiguration.hasTabs() ? 'visible' : 'hidden'"></app-syntax-highlighter-wrapper>
+  <!-- <div id="glow" [style.opacity]="bottomNotice"></div> -->
   <div class="droppable">
     <div class="dropview">
       <h1>Drop like it's hot</h1>

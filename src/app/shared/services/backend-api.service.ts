@@ -30,7 +30,7 @@ export class BackendApiService {
     return this.getSubscriberFromElectronBackend('ipc-server-trigger-find');
   }
 
-  public get onReceiveNewData(): Observable<string> {
+  public get onReceiveNewData(): Observable<string[]> {
     return this.getSubscriberFromElectronBackend('ipc-receive-data');
   }
 
@@ -40,6 +40,10 @@ export class BackendApiService {
 
   public openFileStream(file: string): void {
     this.electron.ipcRenderer.send('ipc-client-request-open-file', file);
+  }
+
+  public stopFileStream(file: string): void {
+    this.electron.ipcRenderer.send('ipc-client-stop-tailing-file', file);
   }
 
   public requestForArguments(): Observable<string> {
