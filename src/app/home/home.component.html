@@ -1,2 +1,9 @@
-<app-syntax-highlighter-wrapper [configuration]="syntaxEditorConfiguration"></app-syntax-highlighter-wrapper>
-<div id="glow" [style.opacity]="bottomNotice"></div>
+<div appDnd (fileDropped)="fileDropped($event)">
+  <app-syntax-highlighter-wrapper [configuration]="syntaxEditorConfiguration"></app-syntax-highlighter-wrapper>
+  <div id="glow" [style.opacity]="bottomNotice"></div>
+  <div class="droppable">
+    <div class="dropview">
+      <h1>Drop like it's hot</h1>
+    </div>
+  </div>
+</div>

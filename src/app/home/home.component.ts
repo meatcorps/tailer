@@ -21,6 +21,11 @@ export class HomeComponent implements OnInit  {
   constructor(private router: Router, private backendApi: BackendApiService) {
   }
 
+  public fileDropped(data) {
+    console.log(data[0].path);
+    this.backendApi.openFileStream(data[0].path);
+  }
+
   ngOnInit(): void {
     this.backendApi.onBackendResetRequest.subscribe(() => this.syntaxEditorConfiguration.update(''));
     this.backendApi.onOpeningFile.subscribe((path) => document.title = path + ' - Tailer');

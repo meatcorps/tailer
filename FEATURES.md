@@ -9,6 +9,7 @@
 
 # Features done
 
+- Drag and drop
 - Fix reload issue releasing
 - Find working in menu
 - Syntax highlight log4net
