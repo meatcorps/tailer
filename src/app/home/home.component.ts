@@ -2,7 +2,6 @@
 
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ElectronService } from '../core/services';
 import {
   SyntaxHighlighterWrapperConfiguration
 } from '../shared/components/syntax-highlighter-wrapper/syntax-highlighter-wrapper-configuration';
@@ -20,6 +19,7 @@ export class HomeComponent implements OnInit  {
   public syntaxEditorConfiguration: SyntaxHighlighterWrapperConfiguration = new SyntaxHighlighterWrapperConfiguration();
   public tabContainerConfiguration: TabContainerSettings = new TabContainerSettings();
   public fileDataCache: Map<string, string> = new Map<string, string>();
+  public scrollPositionCache: Map<string, number> = new Map<string, number>();
 
   constructor(private router: Router, private backendApi: BackendApiService) {
     this.tabContainerConfiguration.setConvert((data: string) => {
@@ -29,14 +29,12 @@ export class HomeComponent implements OnInit  {
   }
 
   public fileDropped(data) {
-    console.log(data[0].path);
     this.backendApi.openFileStream(data[0].path);
   }
 
   ngOnInit(): void {
     // this.backendApi.onBackendResetRequest.subscribe(() => this.syntaxEditorConfiguration.update(''));
     this.backendApi.onOpeningFile.subscribe((path) => {
-      document.title = path + ' - Tailer';
       this.tabContainerConfiguration.add(path);
     });
     this.backendApi.onFindClickedInMenu.subscribe(() => this.syntaxEditorConfiguration.executeCommand('find'));
@@ -53,16 +51,34 @@ export class HomeComponent implements OnInit  {
     });
 
     this.tabContainerConfiguration.on('onActivate').subscribe(tab => {
+      if (tab !== null) {
+        document.title = tab + ' - Tailer 1.0.0e';
+      } else {
+        document.title = 'Tailer 1.0.0e';
+      }
       if (!this.fileDataCache.has(tab)) {
         this.fileDataCache.set(tab, '');
       }
+      if (!this.scrollPositionCache.has(tab)) {
+        this.scrollPositionCache.set(tab, Number.POSITIVE_INFINITY);
+      }
+
       this.syntaxEditorConfiguration.update(this.fileDataCache.get(tab));
+      setTimeout(() =>
+        this.syntaxEditorConfiguration.setScrollPosition(
+          this.scrollPositionCache.get(
+            this.tabContainerConfiguration.getActiveTab()
+          )
+        )
+      , 100);
     });
 
     this.backendApi.requestForArguments().subscribe((args: string) => this.needToOpenCheck(args));
     this.syntaxEditorConfiguration.on('onChange').subscribe(() => this.checkForScroll());
+    this.syntaxEditorConfiguration.on('onScrollChanged').subscribe((scrollPosition) => {
+      this.scrollPositionCache.set(this.tabContainerConfiguration.getActiveTab(), scrollPosition);
+    });
     this.tabContainerConfiguration.on('onRemove').subscribe(tab => this.backendApi.stopFileStream(tab));
-    setInterval(() => this.updateBottomNotice(), 100);
   }
 
   private needToOpenCheck(args: string) {
@@ -74,13 +90,6 @@ export class HomeComponent implements OnInit  {
   private checkForScroll() {
     if (!this.syntaxEditorConfiguration.getSetting('needToScroll', true)) { return; }
     this.bottomNotice = 1;
-  }
-
-  private updateBottomNotice() {
-    this.bottomNotice -= 0.05;
-    if (this.bottomNotice < 0) {
-      this.bottomNotice = 0;
-    }
   }
 
 }

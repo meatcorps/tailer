@@ -18,6 +18,7 @@ export class SyntaxHighlighterWrapperComponent implements OnInit, AfterViewInit 
   public configuration: SyntaxHighlighterWrapperConfiguration;
 
   private aceEditor: ace.Ace.Editor = null;
+  private oldScrollPosition = 0;
 
   public ngAfterViewInit(): void {
     ace.config.set('fontSize',
@@ -59,6 +60,17 @@ export class SyntaxHighlighterWrapperComponent implements OnInit, AfterViewInit 
       .subscribe((code: string) => this.updateCode(code));
     this.configuration.on('onExecuteCommand')
       .subscribe((command: string) => this.aceEditor.execCommand(command));
+
+    setInterval(() => {
+      let currentScrollPosition = Number.POSITIVE_INFINITY;
+      if (!this.isCurrentlyScrolledAtBottom()) {
+        currentScrollPosition = this.aceEditor.renderer.getScrollTop();
+      }
+      if (currentScrollPosition !== this.oldScrollPosition && currentScrollPosition !== -0) {
+        this.oldScrollPosition = currentScrollPosition;
+        this.configuration.invokeOnScrollChanged(currentScrollPosition);
+      }
+    },100);
   }
 
   private insertCode(code: string) {
@@ -71,10 +83,7 @@ export class SyntaxHighlighterWrapperComponent implements OnInit, AfterViewInit 
 
       this.configuration.setSetting('needToScroll', needToScroll);
 
-      if (needToScroll) {
-        this.aceEditor.renderer.scrollToLine(Number.POSITIVE_INFINITY, false, true, () => {
-        });
-      }
+      this.updateScrollPosition(needToScroll);
 
       this.configuration.invokeOnChange();
     }, 10);
@@ -88,13 +97,15 @@ export class SyntaxHighlighterWrapperComponent implements OnInit, AfterViewInit 
 
       this.configuration.setSetting('needToScroll', needToScroll);
 
-      if (needToScroll) {
-        this.aceEditor.renderer.scrollToLine(Number.POSITIVE_INFINITY, false, true, () => {
-        });
-      }
+      // this.updateScrollPosition(needToScroll);
 
       this.configuration.invokeOnChange();
     }, 10);
+  }
+
+  private updateScrollPosition(toTheEnd: boolean) {
+    if (!toTheEnd) {  return; }
+    this.configuration.setScrollPosition(Number.POSITIVE_INFINITY);
   }
 
   private isCurrentlyScrolledAtBottom() {

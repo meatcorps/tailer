@@ -69,6 +69,10 @@ export class TabContainerSettings {
     return this.tabs.length > 0;
   }
 
+  public getActiveTab(): string {
+    return this.currentTab;
+  }
+
   public remove(tabName: string) {
     const tabIndex = this.tabs.indexOf(tabName);
     if (tabIndex === -1) {

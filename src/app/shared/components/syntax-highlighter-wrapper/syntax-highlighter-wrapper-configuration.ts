@@ -6,6 +6,7 @@ export class SyntaxHighlighterWrapperConfiguration {
   private onReady: Subject<void> = new Subject<void>();
   private onUpdate: Subject<string> = new Subject<string>();
   private onChange: Subject<void> = new Subject<void>();
+  private onScrollChanged: Subject<number> = new Subject<number>();
   private onExecuteCommand: Subject<string> = new Subject<string>();
   private onSettingChange: Subject<{setting: string; value: any}> = new Subject<{setting: string; value: any}>();
   private aceEditor: ace.Ace.Editor = null;
@@ -61,12 +62,34 @@ export class SyntaxHighlighterWrapperConfiguration {
     this.onChange.next();
   }
 
+  public invokeOnScrollChanged(scrollPosition: number): void {
+    this.onScrollChanged.next(scrollPosition);
+  }
+
   public executeCommand(command: string): void {
     this.onExecuteCommand.next(command);
   }
 
-  public on(eventName: 'onInsert' | 'onReady' | 'onUpdate' | 'onSettingChange' | 'onChange' | 'onExecuteCommand'): Observable<any> {
+  public on(eventName:
+              'onInsert' |
+              'onReady' |
+              'onUpdate' |
+              'onSettingChange' |
+              'onChange' |
+              'onExecuteCommand' |
+              'onScrollChanged'): Observable<any> {
     return this[eventName].asObservable();
+  }
+
+  public setScrollPosition(scrollPosition: number) {
+    if (this.aceEditor === null) {
+      return;
+    }
+    if (scrollPosition === Number.POSITIVE_INFINITY) {
+      this.aceEditor.renderer.scrollToLine(scrollPosition, false, true, () => {});
+    } else {
+      this.aceEditor.renderer.scrollToY(scrollPosition);
+    }
   }
 
 }

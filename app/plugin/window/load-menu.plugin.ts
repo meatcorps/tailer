@@ -41,7 +41,7 @@ export class LoadMenuForWindow implements IWindowPlugin {
   private OnHelpOpen() {
     this.windowManager.openMessageBox(
       'About Tailer',
-      'This is version 1.0.0\nFor more information visit https://meatcorps.github.io/tailer/'
+      'This is version 1.0.0e Alpha\nFor more information visit https://meatcorps.github.io/tailer/'
     );
   }
 }
