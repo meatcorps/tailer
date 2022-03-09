@@ -1,14 +1,16 @@
 # Feature wanted for release
 
 - System to analyze log entry for filtering etc
-- Make syntax highlight configuratable
+- Make syntax highlight configurable
   - Fase 1: Config file on the side.
   - Fase 2: Config editor for Tailer
-- Tab support with multiple files
 - Latest open files    
+- [Refinement] Better way to set current version
 
 # Features done
 
+- Tab support with multiple files
+- Drag and drop
 - Fix reload issue releasing
 - Find working in menu
 - Syntax highlight log4net
@@ -20,3 +22,7 @@
   - Move Ace logic to own component
   - Service for all backend bindings
   - Central service for current document
+
+# Bug fixed
+
+- [BUG] Remember scroll position when switching tabs

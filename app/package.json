@@ -2,8 +2,29 @@
   "name": "tailer",
   "version": "1.0.0",
   "main": "main.js",
+  "description": "Tailing application specialized for log4net",
+  "homepage": "https://github.com/meatcorps/tailor",
+  "author": {
+    "name": "Dennis Steffen",
+    "email": "dennis@steffen.nl"
+  },
   "private": true,
   "dependencies": {
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.5.4",
+    "ts-node": "^10.5.0",
+    "typedi": "^0.10.0",
     "chokidar": "3.5.3"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.3.0",
+    "@types/mocha": "^9.1.0",
+    "chai": "^4.3.6",
+    "mocha": "^9.2.0",
+    "tslint": "^6.1.3",
+    "typescript": "^4.5.5"
+  },
+  "scripts": {
+    "test": "mocha"
   }
 }

@@ -1,9 +1,10 @@
-<div class="container" style="overflow: hidden;">
-  <div
-    class="app-ace-editor"
-    #editor
-    style="width: 100vw; height: 100vh; margin-top: -2px; margin-left: -2px;"
-  ></div>
-  <!-- <a routerLink="/detail">{{ 'PAGES.HOME.GO_TO_DETAIL' | translate }}</a> -->
+<div appDnd (fileDropped)="fileDropped($event)">
+  <app-tab-container [configuration]="tabContainerConfiguration"></app-tab-container>
+  <app-syntax-highlighter-wrapper [configuration]="syntaxEditorConfiguration" [style.visibility]="tabContainerConfiguration.hasTabs() ? 'visible' : 'hidden'"></app-syntax-highlighter-wrapper>
+  <!-- <div id="glow" [style.opacity]="bottomNotice"></div> -->
+  <div class="droppable">
+    <div class="dropview">
+      <h1>Drop like it's hot</h1>
+    </div>
+  </div>
 </div>
-<div id="glow" [style.opacity]="bottomNotice"></div>
