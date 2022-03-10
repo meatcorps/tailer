@@ -5,7 +5,6 @@
   - Fase 1: Config file on the side.
   - Fase 2: Config editor for Tailer
 - Latest open files    
-- [Refinement] Better way to set current version
 
 # Features done
 
@@ -26,3 +25,4 @@
 # Bug fixed
 
 - [BUG] Remember scroll position when switching tabs
+- [Refinement] Better way to set current version

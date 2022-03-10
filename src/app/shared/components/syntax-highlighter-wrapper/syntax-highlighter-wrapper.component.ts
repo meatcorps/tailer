@@ -97,7 +97,7 @@ export class SyntaxHighlighterWrapperComponent implements OnInit, AfterViewInit 
 
       this.configuration.setSetting('needToScroll', needToScroll);
 
-      // this.updateScrollPosition(needToScroll);
+      this.updateScrollPosition(needToScroll);
 
       this.configuration.invokeOnChange();
     }, 10);

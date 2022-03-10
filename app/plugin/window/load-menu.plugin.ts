@@ -4,6 +4,7 @@ import {Service} from "typedi";
 import {WindowItem} from "../../core/window";
 import {WindowMenu} from "../../settings/window-menu";
 import {WindowManager} from "../../core/window-manager";
+import {CentralAppConfig} from "../../settings";
 
 @Service({ id: WindowPluginToken, multiple: true })
 export class LoadMenuForWindow implements IWindowPlugin {
@@ -41,7 +42,7 @@ export class LoadMenuForWindow implements IWindowPlugin {
   private OnHelpOpen() {
     this.windowManager.openMessageBox(
       'About Tailer',
-      'This is version 1.0.0e Alpha\nFor more information visit https://meatcorps.github.io/tailer/'
+      `This is version ${CentralAppConfig.version} Alpha\nFor more information visit https://meatcorps.github.io/tailer/`
     );
   }
 }

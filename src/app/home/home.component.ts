@@ -7,6 +7,8 @@ import {
 } from '../shared/components/syntax-highlighter-wrapper/syntax-highlighter-wrapper-configuration';
 import {BackendApiService} from '../shared/services/backend-api.service';
 import {TabContainerSettings} from '../shared/components/tab-container/tab-container-settings';
+import {delay, take} from 'rxjs/operators';
+import {CentralAppConfig} from '../../../app/settings';
 
 @Component({
   selector: 'app-home',
@@ -16,10 +18,18 @@ import {TabContainerSettings} from '../shared/components/tab-container/tab-conta
 export class HomeComponent implements OnInit  {
   public code = '';
   public bottomNotice = 0;
-  public syntaxEditorConfiguration: SyntaxHighlighterWrapperConfiguration = new SyntaxHighlighterWrapperConfiguration();
+  public tabSettings: Array<{path: string; settings: SyntaxHighlighterWrapperConfiguration}> = [];
   public tabContainerConfiguration: TabContainerSettings = new TabContainerSettings();
-  public fileDataCache: Map<string, string> = new Map<string, string>();
-  public scrollPositionCache: Map<string, number> = new Map<string, number>();
+  public syntaxEditorConfigurations: Map<string, SyntaxHighlighterWrapperConfiguration> =
+    new Map<string, SyntaxHighlighterWrapperConfiguration>();
+
+  private get currentTab(): string {
+    return this.tabContainerConfiguration.getActiveTab();
+  }
+
+  public get syntaxEditorConfiguration(): SyntaxHighlighterWrapperConfiguration {
+    return this.syntaxEditorConfigurations.get(this.currentTab);
+  }
 
   constructor(private router: Router, private backendApi: BackendApiService) {
     this.tabContainerConfiguration.setConvert((data: string) => {
@@ -33,51 +43,41 @@ export class HomeComponent implements OnInit  {
   }
 
   ngOnInit(): void {
-    // this.backendApi.onBackendResetRequest.subscribe(() => this.syntaxEditorConfiguration.update(''));
-    this.backendApi.onOpeningFile.subscribe((path) => {
-      this.tabContainerConfiguration.add(path);
-    });
     this.backendApi.onFindClickedInMenu.subscribe(() => this.syntaxEditorConfiguration.executeCommand('find'));
     this.backendApi.onReceiveNewData.subscribe((newData: string[]) => {
-      if (!this.fileDataCache.has(newData[1])) {
-        this.fileDataCache.set(newData[1], newData[0]);
+      const filePath = newData[1];
+      const data = newData[0];
+      if (this.syntaxEditorConfigurations.has(filePath)) {
+        this.syntaxEditorConfigurations.get(filePath).insert(data);
       } else {
-        this.fileDataCache.set(newData[1], this.fileDataCache.get(newData[1]) + newData[0]);
+        this.syntaxEditorConfigurations.set(filePath, new SyntaxHighlighterWrapperConfiguration());
+        this.tabSettings = [];
+        this.syntaxEditorConfigurations.forEach((setting, i) => this.tabSettings.push({
+          path: i,
+          settings: setting
+        }));
+        this.tabContainerConfiguration.add(filePath);
+        this.syntaxEditorConfigurations
+          .get(filePath)
+          .on('onReady')
+          .pipe(take(1), delay(100))
+          .subscribe(() => {
+            this.syntaxEditorConfigurations.get(filePath).update(data);
+          });
+        this.syntaxEditorConfigurations.get(filePath).requestSyntaxReady();
       }
-      if (this.tabContainerConfiguration.isTabActive(newData[1])) {
-        this.syntaxEditorConfiguration.insert(newData[0]);
-      }
-      this.tabContainerConfiguration.tabIdentify(newData[1]);
+      this.tabContainerConfiguration.tabIdentify(filePath);
     });
 
     this.tabContainerConfiguration.on('onActivate').subscribe(tab => {
       if (tab !== null) {
-        document.title = tab + ' - Tailer 1.0.0e';
+        document.title = `${tab} - Tailer ${CentralAppConfig.version}`;
       } else {
-        document.title = 'Tailer 1.0.0e';
+        document.title = `Tailer ${CentralAppConfig.version}`;
       }
-      if (!this.fileDataCache.has(tab)) {
-        this.fileDataCache.set(tab, '');
-      }
-      if (!this.scrollPositionCache.has(tab)) {
-        this.scrollPositionCache.set(tab, Number.POSITIVE_INFINITY);
-      }
-
-      this.syntaxEditorConfiguration.update(this.fileDataCache.get(tab));
-      setTimeout(() =>
-        this.syntaxEditorConfiguration.setScrollPosition(
-          this.scrollPositionCache.get(
-            this.tabContainerConfiguration.getActiveTab()
-          )
-        )
-      , 100);
     });
 
     this.backendApi.requestForArguments().subscribe((args: string) => this.needToOpenCheck(args));
-    this.syntaxEditorConfiguration.on('onChange').subscribe(() => this.checkForScroll());
-    this.syntaxEditorConfiguration.on('onScrollChanged').subscribe((scrollPosition) => {
-      this.scrollPositionCache.set(this.tabContainerConfiguration.getActiveTab(), scrollPosition);
-    });
     this.tabContainerConfiguration.on('onRemove').subscribe(tab => this.backendApi.stopFileStream(tab));
   }
 
@@ -85,11 +85,6 @@ export class HomeComponent implements OnInit  {
     if (!(args.length === 1 && args[0].indexOf('\\') > -1)) { return; }
     this.backendApi.openFileStream(args[0]);
     console.log('trying to open', args[0]);
-  }
-
-  private checkForScroll() {
-    if (!this.syntaxEditorConfiguration.getSetting('needToScroll', true)) { return; }
-    this.bottomNotice = 1;
   }
 
 }
