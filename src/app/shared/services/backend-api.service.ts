@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {ElectronService} from '../../core/services';
 import {Observable, Subject} from 'rxjs';
+import {filter, take} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -50,6 +51,24 @@ export class BackendApiService {
     const returnObservable = this.onArguments;
     this.electron.ipcRenderer.send('ipc-request-args');
     return returnObservable;
+  }
+
+  public onOpenFile(location: string, defaultData: string): Observable<string[]> {
+    this.electron.ipcRenderer.send('ipc-client-get-file', [location, defaultData]);
+    return this.getSubscriberFromElectronBackend('ipc-client-get-file-data')
+      .pipe(
+        filter(x => x[0] === location),
+        take(1)
+      );
+  }
+
+  public onSaveFile(location: string, data: string): Observable<string[]> {
+    this.electron.ipcRenderer.send('ipc-client-set-file', [location, data]);
+    return this.getSubscriberFromElectronBackend('ipc-client-set-file-data')
+      .pipe(
+        filter(x => x[0] === location),
+        take(1)
+      );
   }
 
   private getSubscriberFromElectronBackend(name: string): Observable<any> {

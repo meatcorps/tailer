@@ -9,6 +9,7 @@ import {MainApp} from "./core/app";
 import {WindowManager} from "./core/window-manager";
 import {WindowItem} from "./core/window";
 import {ArgumentsPlugin} from "./plugin/window/arguments.plugin";
+import {FileReaderWriterPlugin} from "./plugin/window/file-reader-writer.plugin";
 
 Container.import([
   ArgumentsPlugin,
@@ -17,6 +18,7 @@ Container.import([
   LoadMenuForWindow,
   PreventWindowGetReloaded,
   SimpleFileListener,
+  FileReaderWriterPlugin,
   MainApp,
   WindowManager,
   WindowItem

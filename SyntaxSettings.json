@@ -1,0 +1,86 @@
+{
+    "rules": [
+        {
+            "regex": "\\b(Trace)\\b:",
+            "token": "verbose"
+        },
+        {
+            "regex": "\\b(DEBUG|Debug)\\b|\\b(debug)\\:",
+            "token": "debug"
+        },
+        {
+            "regex": "\\b(HINT|INFO|INFORMATION|Info|NOTICE|II)\\b|\\b(info|information)\\:",
+            "token": "info"
+        },
+        {
+            "regex": "\\b(WARNING|WARN|Warn|WW)\\b|\\b(warning)\\:",
+            "token": "warning"
+        },
+        {
+            "regex": "\\b(ALERT|CRITICAL|EMERGENCY|ERROR|FAILURE|FAIL|Fatal|FATAL|Error|EE)\\b|\\b(error)\\:",
+            "token": "error"
+        },
+        {
+            "regex": "\\b\\d{4}-\\d{2}-\\d{2}(T|\\b)",
+            "token": "date"
+        },
+        {
+            "regex": "(?<=(^|\\s))\\d{2}[^\\w\\s]\\d{2}[^\\w\\s]\\d{4}\\b",
+            "token": "date"
+        },
+        {
+            "regex": "\\d{1,2}:\\d{2}(:\\d{2}([.,]\\d{1,})?)?(Z| ?[+-]\\d{1,2}:\\d{2})?\\b",
+            "token": "date"
+        },
+        {
+            "regex": "\\b([0-9a-fA-F]{40}|[0-9a-fA-F]{10}|[0-9a-fA-F]{7})\\b",
+            "token": "language"
+        },
+        {
+            "regex": "\\b[0-9a-fA-F]{8}[-]?([0-9a-fA-F]{4}[-]?){3}[0-9a-fA-F]{12}\\b",
+            "token": "constant"
+        },
+        {
+            "regex": "\\b([0-9a-fA-F]{2,}[:-])+[0-9a-fA-F]{2,}\\b",
+            "token": "constant"
+        },
+        {
+            "regex": "\\b([0-9]+|true|false|null)\\b",
+            "token": "constant"
+        },
+        {
+            "regex": "\"[^\"]*\"",
+            "token": "string"
+        },
+        {
+            "regex": "(?<![\\w])'[^']*'",
+            "token": "string"
+        },
+        {
+            "regex": "\\b([a-zA-Z.]*Exception)\\b",
+            "token": "regexp"
+        },
+        {
+            "regex": "(http:|https:)\\/\\/[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)?",
+            "token": "url"
+        },
+        {
+            "regex": "(?<![\\w/\\\\])([\\w-]+\\.)+([\\w-])+(?![\\w/\\\\])",
+            "token": "keyword"
+        }
+    ],
+    "tokens": [
+        {
+            "token": "error",
+            "color": "#ff0000"
+        },
+        {
+            "token": "info",
+            "color": "pink"
+        },
+        {
+            "token": "warning",
+            "color": "yellow"
+        }
+    ]
+}

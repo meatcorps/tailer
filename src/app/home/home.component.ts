@@ -78,7 +78,10 @@ export class HomeComponent implements OnInit  {
     });
 
     this.backendApi.requestForArguments().subscribe((args: string) => this.needToOpenCheck(args));
-    this.tabContainerConfiguration.on('onRemove').subscribe(tab => this.backendApi.stopFileStream(tab));
+    this.tabContainerConfiguration.on('onRemove').subscribe(tab => {
+      this.backendApi.stopFileStream(tab);
+      this.syntaxEditorConfigurations.delete(tab);
+    });
   }
 
   private needToOpenCheck(args: string) {
