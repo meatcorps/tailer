@@ -39,6 +39,14 @@ export class BackendApiService {
     return this.getSubscriberFromElectronBackend('ipc-arguments');
   }
 
+  public get onToggleSettings(): Observable<string> {
+    return this.getSubscriberFromElectronBackend('ipc-toggle-settings');
+  }
+
+  public triggerToggleSettings() {
+    this.subjects.get('ipc-toggle-settings').next([]);
+  }
+
   public openFileStream(file: string): void {
     this.electron.ipcRenderer.send('ipc-client-request-open-file', file);
   }

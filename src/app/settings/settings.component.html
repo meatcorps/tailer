@@ -1,0 +1,76 @@
+<div class="main-settings" *ngIf="settings !== null">
+  <div class="settings">
+    <div class="scroll-container">
+      <h2>Colors</h2>
+      <p class="question">
+        <small>Theme:</small><br>
+        <select [(ngModel)]="settings.base">
+          <optgroup label="Bright"><option value="chrome">Chrome</option><option value="clouds">Clouds</option><option value="crimson_editor">Crimson Editor</option><option value="dawn">Dawn</option><option value="dreamweaver">Dreamweaver</option><option value="eclipse">Eclipse</option><option value="github">GitHub</option><option value="iplastic">IPlastic</option><option value="solarized_light">Solarized Light</option><option value="textmate">TextMate</option><option value="tomorrow">Tomorrow</option><option value="xcode">Xcode</option><option value="kuroir">Kuroir</option><option value="katzenmilch">KatzenMilch</option><option value="sqlserver">SQL Server</option></optgroup><optgroup label="Dark"><option value="ambiance">Ambiance</option><option value="chaos">Chaos</option><option value="clouds_midnight">Clouds Midnight</option><option value="dracula">Dracula</option><option value="cobalt">Cobalt</option><option value="gruvbox">Gruvbox</option><option value="gob">Green on Black</option><option value="idle_fingers">idle Fingers</option><option value="kr_theme">krTheme</option><option value="merbivore">Merbivore</option><option value="merbivore_soft">Merbivore Soft</option><option value="mono_industrial">Mono Industrial</option><option value="monokai">Monokai</option><option value="nord_dark">Nord Dark</option><option value="one_dark">One Dark</option><option value="pastel_on_dark">Pastel on dark</option><option value="solarized_dark">Solarized Dark</option><option value="terminal">Terminal</option><option value="tomorrow_night">Tomorrow Night</option><option value="tomorrow_night_blue">Tomorrow Night Blue</option><option value="tomorrow_night_bright">Tomorrow Night Bright</option><option value="tomorrow_night_eighties">Tomorrow Night 80s</option><option value="twilight">Twilight</option><option value="vibrant_ink">Vibrant Ink</option></optgroup>
+        </select>
+      </p>
+      <table>
+        <tr><th>Name<br><small>&nbsp;</small></th><th>Fore color<br><small>Keep empty to ignore</small></th><th>Back color<br><small>Keep empty to ignore</small></th><th colspan="2"></th></tr>
+        <tr *ngFor="let color of settings.tokens">
+          <td><input [(ngModel)]="color.token"></td>
+          <td>
+            <input [(ngModel)]="color.color">
+          </td>
+          <td>
+            <input [(ngModel)]="color['background-color']">
+          </td>
+          <td [style.background-color]="color['background-color']" [style.color]="color.color">Test</td>
+          <td><button (click)="removeColor(color)">Remove</button></td>
+        </tr>
+        <tr class="bottom"><td colspan="5">
+          <button (click)="addColor()">Add</button>
+        </td></tr>
+      </table>
+      <h2>Syntax Highligh rules</h2><br>
+      <table>
+        <tr><th>Use color<br><small>&nbsp;</small></th><th>Rule<br><small>RegEx</small><br></th><th style="width: 32px;">Prio<br><small></small><br></th><th colspan="2"></th></tr>
+        <tr *ngFor="let rule of settings.rules">
+          <td><select [(ngModel)]="rule.token">
+            <optgroup label="Default">
+              <option value="verbose">verbose</option>
+              <option value="debug">debug</option>
+              <option value="info">info</option>
+              <option value="warning">warning</option>
+              <option value="error">error</option>
+              <option value="date">date</option>
+              <option value="language">language</option>
+              <option value="constant">constant</option>
+              <option value="string">string</option>
+              <option value="regexp">regexp</option>
+              <option value="url">url</option>
+              <option value="keyword">keyword</option>
+            </optgroup>
+            <optgroup label="Custom">
+              <option *ngFor="let color of settings.tokens" [value]="color.token">{{color.token}}</option>
+            </optgroup>
+          </select></td>
+          <td>
+            <input [(ngModel)]="rule.regex">
+          </td>
+          <td>
+            <input [(ngModel)]="rule.prio" style="width: 32px;">
+          </td>
+          <td><button (click)="removeRule(rule)">Remove</button></td>
+        </tr>
+        <tr class="bottom"><td colspan="5">
+          <button (click)="orderRules()">Reorder</button>&nbsp;
+          <button (click)="addRule()">Add</button>
+        </td></tr>
+      </table>
+
+      <h2>RegEx helper</h2><br>
+      <a href="https://www.regex101.com" target="_blank">Click here for external helper RegEx101</a>
+    </div>
+    <div class="actions">
+      <button (click)="save()" *ngIf="turnOnEditor">Save and try</button>&nbsp;
+      <button (click)="close()" *ngIf="turnOnEditor">Close</button>
+    </div>
+  </div>
+  <div class="tester">
+    <app-syntax-highlighter-wrapper *ngIf="turnOnEditor" [configuration]="syntaxSettings"></app-syntax-highlighter-wrapper>
+  </div>
+</div>

@@ -1,14 +1,13 @@
 # Feature wanted for release
 
 - System to analyze log entry for filtering etc
-- Make syntax highlight configurable
-  - Fase 2: Config editor for Tailer
 - Latest open files    
 
 # Features done
 
 - Make syntax highlight configurable
   - Fase 1: Config file on the side.
+  - Fase 2: Config editor for Tailer
 - Tab support with multiple files
 - Drag and drop
 - Fix reload issue releasing

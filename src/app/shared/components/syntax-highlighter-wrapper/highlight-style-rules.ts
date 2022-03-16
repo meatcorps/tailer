@@ -13,6 +13,9 @@ export function defaultRules() {
     regex: /\b(Trace)\b:/,
     token: 'verbose' // verbose
   },{
+    regex: /\b(AEA)\b:/,
+    token: 'verbose' // verbose
+  },{
     regex: /\b(DEBUG|Debug)\b|\b(debug)\:/,
     token: 'debug' // debug
   },{

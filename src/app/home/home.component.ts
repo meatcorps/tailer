@@ -18,6 +18,7 @@ import {CentralAppConfig} from '../../../app/settings';
 export class HomeComponent implements OnInit  {
   public code = '';
   public bottomNotice = 0;
+  public settingsOpen = false;
   public tabSettings: Array<{path: string; settings: SyntaxHighlighterWrapperConfiguration}> = [];
   public tabContainerConfiguration: TabContainerSettings = new TabContainerSettings();
   public syntaxEditorConfigurations: Map<string, SyntaxHighlighterWrapperConfiguration> =
@@ -78,10 +79,13 @@ export class HomeComponent implements OnInit  {
     });
 
     this.backendApi.requestForArguments().subscribe((args: string) => this.needToOpenCheck(args));
+
     this.tabContainerConfiguration.on('onRemove').subscribe(tab => {
       this.backendApi.stopFileStream(tab);
       this.syntaxEditorConfigurations.delete(tab);
     });
+
+    this.backendApi.onToggleSettings.subscribe(() => this.settingsOpen = !this.settingsOpen);
   }
 
   private needToOpenCheck(args: string) {

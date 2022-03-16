@@ -3,7 +3,7 @@ import {Observable, Subject} from "rxjs";
 
 const { Menu } = require('electron')
 
-type actions = 'Open'|'Find'|'Help';
+type actions = 'Open'|'Find'|'Help'|'Settings';
 
 @Service()
 export class WindowMenu {
@@ -18,6 +18,12 @@ export class WindowMenu {
           label: 'Open',
           click: async () => {
             this.onActionSubject.next('Open');
+          }
+        },
+        {
+          label: 'Settings',
+          click: async () => {
+            this.onActionSubject.next('Settings');
           }
         },
         { role: 'quit' }

@@ -16,6 +16,9 @@ export class LoadMenuForWindow implements IWindowPlugin {
         case "Open":
           this.OnFileOpen();
           return;
+        case "Settings":
+          this.OnToggleSettings();
+          return;
         case "Find":
           this.OnFindOpen();
           return;
@@ -37,6 +40,10 @@ export class LoadMenuForWindow implements IWindowPlugin {
 
   private OnFindOpen() {
     this.windowItem.invokeIpcEvent('ipc-server-trigger-find');
+  }
+
+  private OnToggleSettings() {
+    this.windowItem.invokeIpcEvent('ipc-toggle-settings');
   }
 
   private OnHelpOpen() {

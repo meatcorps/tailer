@@ -45,6 +45,10 @@ export class SyntaxHighlighterWrapperConfiguration {
     return this.settings.get(setting);
   }
 
+  public getCurrentValue(): string {
+    return this.aceEditor.session.getValue();
+  }
+
   public requestSyntaxReady(): void {
     if (this.isReady) { return; }
     this.onReady.next();

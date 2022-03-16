@@ -26,14 +26,16 @@ export class SyntaxHighlighterWrapperComponent implements OnInit, AfterViewInit 
   private aceEditor: ace.Ace.Editor = null;
   private oldScrollPosition = 0;
   private syntaxRules = [];
+  private colorBase = 'twilight';
 
   constructor(private backendApi: BackendApiService, protected sanitizer: DomSanitizer) {}
 
   public ngAfterViewInit(): void {
 
-    this.backendApi.onOpenFile('SyntaxSettings.json', this.getJson()).subscribe((data) => {
+    this.backendApi.onOpenFile(this.configuration.getSetting('configFile', 'SyntaxSettings.json'), this.getJson()).subscribe((data) => {
       this.syntaxRules = JSON.parse(data[1])['rules'];
       this.tokens = JSON.parse(data[1])['tokens'];
+      this.colorBase = JSON.parse(data[1])['base'];
       this.convertTokenToCss();
       this.syntaxRules.forEach(x => x.regex = new RegExp(x.regex));
 
@@ -47,14 +49,15 @@ export class SyntaxHighlighterWrapperComponent implements OnInit, AfterViewInit 
 
       this.aceEditor.session.setValue('');
       this.aceEditor.setTheme(
-        this.configuration.getSetting('theme', 'ace/theme/twilight'));
+        this.configuration.getSetting('theme', 'ace/theme/' + this.colorBase)
+      );
 
       const oop = ace.require('ace/lib/oop');
       const textMode = ace.require('ace/mode/text').Mode;
       const textHighlightRules = ace.require('ace/mode/text_highlight_rules').TextHighlightRules;
 
       console.log('openDataReceived', this.syntaxRules, defaultRules());
-      const customHighlightRules = highlightStyleRules(defaultRules());
+      const customHighlightRules = highlightStyleRules(this.syntaxRules);
 
       oop.inherits(customHighlightRules, textHighlightRules);
 
@@ -94,7 +97,7 @@ export class SyntaxHighlighterWrapperComponent implements OnInit, AfterViewInit 
   private getJson() {
     const rules = defaultRules();
     rules.forEach(x => x.regex = this.ignoreType(x.regex.source));
-    return JSON.stringify({rules, tokens: defaultTokens() }, null, 4);
+    return JSON.stringify({rules, tokens: defaultTokens(), base: this.colorBase }, null, 4);
   }
 
   private ignoreType(data: any): any {
@@ -102,14 +105,17 @@ export class SyntaxHighlighterWrapperComponent implements OnInit, AfterViewInit 
   }
 
   private convertTokenToCss() {
+    this.tokenCss = '';
     this.tokens.slice().forEach(token => {
       this.tokenCss += `.ace_${token['token'].replace(' ', '')} { `;
       delete token['token'];
       const tokenKeys = Object.keys(token);
       tokenKeys.forEach(tokenKey => {
-        this.tokenCss += `${tokenKey}: ${token[tokenKey]}; `;
+        if (token[tokenKey].length > 0) {
+          this.tokenCss += `${tokenKey}: ${token[tokenKey]} !important; `;
+        }
       });
-      this.tokenCss += '}';
+      this.tokenCss += '}\n';
     });
 
     this.tokenCss = this.tokenCss.replace('<', '');

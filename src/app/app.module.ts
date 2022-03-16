@@ -39,7 +39,6 @@ const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>  new Transl
         })
     ],
     providers: [],
-    exports: [],
     bootstrap: [AppComponent]
 })
 export class AppModule {}
