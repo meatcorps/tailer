@@ -3,9 +3,10 @@
 import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import * as ace from 'ace-builds';
 import {SyntaxHighlighterWrapperConfiguration} from './syntax-highlighter-wrapper-configuration';
-import {defaultRules, defaultTokens, highlightStyleRules} from './highlight-style-rules';
+import {defaultRules, highlightStyleRules} from './highlight-style-rules';
 import {BackendApiService} from '../../services/backend-api.service';
 import {DomSanitizer} from '@angular/platform-browser';
+import {ConfigService} from '../../services/config.service';
 
 // noinspection JSMethodCanBeStatic
 @Component({
@@ -28,14 +29,14 @@ export class SyntaxHighlighterWrapperComponent implements OnInit, AfterViewInit 
   private syntaxRules = [];
   private colorBase = 'twilight';
 
-  constructor(private backendApi: BackendApiService, protected sanitizer: DomSanitizer) {}
+  constructor(private backendApi: BackendApiService, protected sanitizer: DomSanitizer, private config: ConfigService) {}
 
   public ngAfterViewInit(): void {
 
-    this.backendApi.onOpenFile(this.configuration.getSetting('configFile', 'SyntaxSettings.json'), this.getJson()).subscribe((data) => {
-      this.syntaxRules = JSON.parse(data[1])['rules'];
-      this.tokens = JSON.parse(data[1])['tokens'];
-      this.colorBase = JSON.parse(data[1])['base'];
+    this.config.loadConfiguration(this.configuration.getSetting('configFile', this.config.defaultFile)).subscribe((data) => {
+      this.syntaxRules = data['rules'];
+      this.tokens = data['tokens'];
+      this.colorBase = data['base'];
       this.convertTokenToCss();
       this.syntaxRules.forEach(x => x.regex = new RegExp(x.regex));
 
@@ -92,16 +93,6 @@ export class SyntaxHighlighterWrapperComponent implements OnInit, AfterViewInit 
         this.configuration.invokeOnScrollChanged(currentScrollPosition);
       }
     },100);
-  }
-
-  private getJson() {
-    const rules = defaultRules();
-    rules.forEach(x => x.regex = this.ignoreType(x.regex.source));
-    return JSON.stringify({rules, tokens: defaultTokens(), base: this.colorBase }, null, 4);
-  }
-
-  private ignoreType(data: any): any {
-    return data;
   }
 
   private convertTokenToCss() {

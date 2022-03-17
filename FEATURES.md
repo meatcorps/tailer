@@ -26,3 +26,5 @@
 
 - [BUG] Remember scroll position when switching tabs
 - [Refinement] Better way to set current version
+- [Bug] When opening tailer the first time open first some file. Then the settings page. Otherwise it won't work. This happens only the first time.
+- [Bug] Change the location of configuration file so it always can write. Right know Tailor won't work in the Program Files folder.

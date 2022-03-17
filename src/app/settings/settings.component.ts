@@ -3,6 +3,7 @@ import {BackendApiService} from '../shared/services/backend-api.service';
 import {
   SyntaxHighlighterWrapperConfiguration
 } from '../shared/components/syntax-highlighter-wrapper/syntax-highlighter-wrapper-configuration';
+import {ConfigService} from '../shared/services/config.service';
 
 @Component({
   selector: 'app-settings',
@@ -14,11 +15,11 @@ export class SettingsComponent implements OnInit {
   public syntaxSettings: SyntaxHighlighterWrapperConfiguration = new SyntaxHighlighterWrapperConfiguration();
   public turnOnEditor = true;
 
-  constructor(private backendApi: BackendApiService) { }
+  constructor(private backendApi: BackendApiService, private config: ConfigService) { }
 
   ngOnInit(): void {
-    this.backendApi.onOpenFile('SyntaxSettings.json', '').subscribe(data => {
-      this.settings = JSON.parse(data[1]);
+    this.config.loadConfiguration(this.config.defaultFile).subscribe(data => {
+      this.settings = data;
       this.settings.rules.forEach((item, i) => item.prio = i);
     });
   }
@@ -51,11 +52,10 @@ export class SettingsComponent implements OnInit {
 
   save() {
     this.settings.rules.forEach((item, i) => delete this.settings.rules[i].prio);
-    const jsonData = JSON.stringify(this.settings, null, 4);
     this.settings.rules.forEach((item, i) => item.prio = i);
     const codeData = this.syntaxSettings.getCurrentValue();
 
-    this.backendApi.onSaveFile('SyntaxSettings.json', jsonData).subscribe(() => {
+    this.config.saveConfiguration(this.config.defaultFile, this.settings).subscribe(() => {
       setTimeout(() =>  this.turnOnEditor = true, 200);
       setTimeout(() =>  this.syntaxSettings.update(codeData), 300);
     });

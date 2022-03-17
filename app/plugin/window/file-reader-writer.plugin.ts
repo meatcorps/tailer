@@ -40,6 +40,6 @@ export class FileReaderWriterPlugin implements IWindowPlugin {
   }
 
   private GetRealLocation(location: string): string {
-    return path.normalize(app.getAppPath() + '/' + location);
+    return path.normalize(app.getPath('userData') + '/' + location);
   }
 }
