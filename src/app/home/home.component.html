@@ -1,16 +1,28 @@
-<div appDnd (fileDropped)="fileDropped($event)" class="dropzone" *ngIf="!settingsOpen">
+<div appDnd (fileDropped)="fileDropped($event)" class="dropzone" [class.hideeditor]="settingsOpen">
   <app-tab-container [configuration]="tabContainerConfiguration"></app-tab-container>
   <app-syntax-highlighter-wrapper
-    *ngFor="let tab of this.tabSettings"
+    *ngFor="let tab of this.tabSettings; trackBy: trackTab"
     [configuration]="tab.settings"
-    [style.display]="tabContainerConfiguration.isTabActive(tab.path) ? 'block' : 'none'">
+    [class.hideeditor]="!tabContainerConfiguration.isTabActive(tab.path)">
   </app-syntax-highlighter-wrapper>
   <div class="droppable">
     <div class="dropview">
       <h1>Drop like it's hot</h1>
     </div>
   </div>
-</div>
-<app-settings *ngIf="settingsOpen">
 
-</app-settings>
+  <div *ngIf="!tabContainerConfiguration.hasTabs()" class="latest-file-overview">
+    <h2>Nothing is open! Latest open file(s):</h2>
+    <ul>
+      <li *ngFor="let historyItem of latestOpen.getItems">
+        <a href="javascript: void(0);" (click)="backendApi.openFileStream(historyItem.location)">{{historyItem.location}}<br><small>{{historyItem.date}}</small></a>
+        <button (click)="latestOpen.removeFromHistory(historyItem.location)">x</button>
+      </li>
+      <li *ngIf="latestOpen.getItems.length === 0">Nothing in the history. Kinda lonely...</li>
+    </ul>
+    <button *ngIf="latestOpen.getItems.length > 0" (click)="latestOpen.removeAll()">Remove all</button>
+  </div>
+</div>
+
+<app-settings *ngIf="settingsOpen"></app-settings>
+

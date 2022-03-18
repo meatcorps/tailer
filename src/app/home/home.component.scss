@@ -52,3 +52,70 @@
 .dropzone {
   height: 100vh;
 }
+
+.latest-file-overview {
+  background: #222;
+  width: calc(100vw - 160px);
+  height: calc(100vh - 130px);
+  margin-left: 50px;
+  padding: 15px 30px;
+  margin-top: 15px;
+  border-radius: 10px;
+  box-shadow: inset 0 0 50px #111;
+  color: white;
+  overflow: auto;
+}
+
+.latest-file-overview button {
+  border: 1px solid rgba(255,255,255,0.5);
+  background: #444;
+  color: white;
+  padding: 4px 8px;
+}
+
+.latest-file-overview a {
+  color: cornflowerblue;
+}
+
+.latest-file-overview a small {
+  opacity: 0.5;
+  line-height: 8px;
+}
+
+.latest-file-overview a {
+  display: inline-block;
+  width: calc(100vw - 230px);
+  vertical-align: middle;
+  padding-left: 15px;
+}
+
+.latest-file-overview li {
+  background: rgba(0,0,0,0.1);
+  padding: 4px;
+  margin: 2px;
+}
+
+.latest-file-overview ul {
+  list-style: none;
+  margin: 15px 0;
+  padding: 0;
+}
+
+.latest-file-overview li:nth-child(odd) {
+  background: rgba(0,0,0,0.3);
+}
+
+.latest-file-overview li:hover {
+  box-shadow: inset 0 0 20px #ffffff66;
+  background: gray;
+}
+
+.latest-file-overview li:hover a {
+  color: black;
+}
+
+.hideeditor {
+  left: 200vw;
+  position: absolute;
+}
+

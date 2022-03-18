@@ -1,10 +1,10 @@
 # Feature wanted for release
 
 - System to analyze log entry for filtering etc
-- Latest open files    
 
 # Features done
 
+- Latest open files
 - Make syntax highlight configurable
   - Fase 1: Config file on the side.
   - Fase 2: Config editor for Tailer
@@ -28,3 +28,4 @@
 - [Refinement] Better way to set current version
 - [Bug] When opening tailer the first time open first some file. Then the settings page. Otherwise it won't work. This happens only the first time.
 - [Bug] Change the location of configuration file so it always can write. Right know Tailor won't work in the Program Files folder.
+- [Bug] Switching tabs was problematic 

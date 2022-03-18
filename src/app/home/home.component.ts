@@ -9,6 +9,7 @@ import {BackendApiService} from '../shared/services/backend-api.service';
 import {TabContainerSettings} from '../shared/components/tab-container/tab-container-settings';
 import {delay, take} from 'rxjs/operators';
 import {CentralAppConfig} from '../../../app/settings';
+import {LatestFilesService} from '../shared/services/latest-files.service';
 
 @Component({
   selector: 'app-home',
@@ -32,7 +33,7 @@ export class HomeComponent implements OnInit  {
     return this.syntaxEditorConfigurations.get(this.currentTab);
   }
 
-  constructor(private router: Router, private backendApi: BackendApiService) {
+  constructor(private router: Router, public backendApi: BackendApiService, public latestOpen: LatestFilesService) {
     this.tabContainerConfiguration.setConvert((data: string) => {
       const arr = data.split('\\');
       return arr[arr.length - 1];
@@ -41,6 +42,10 @@ export class HomeComponent implements OnInit  {
 
   public fileDropped(data) {
     this.backendApi.openFileStream(data[0].path);
+  }
+
+  public trackTab(index: number, tab: any) {
+    return tab.path;
   }
 
   ngOnInit(): void {
@@ -58,6 +63,7 @@ export class HomeComponent implements OnInit  {
           settings: setting
         }));
         this.tabContainerConfiguration.add(filePath);
+        this.latestOpen.addToHistory(filePath);
         this.syntaxEditorConfigurations
           .get(filePath)
           .on('onReady')
