@@ -7,6 +7,8 @@ import {defaultRules, highlightStyleRules} from './highlight-style-rules';
 import {BackendApiService} from '../../services/backend-api.service';
 import {DomSanitizer} from '@angular/platform-browser';
 import {ConfigService} from '../../services/config.service';
+import {Subject} from 'rxjs';
+import {sampleTime} from 'rxjs/operators';
 
 // noinspection JSMethodCanBeStatic
 @Component({
@@ -23,11 +25,15 @@ export class SyntaxHighlighterWrapperComponent implements OnInit, AfterViewInit 
 
   public tokens = [];
   public tokenCss: any;
+  public currentFilter = '';
 
+  private currentFilterInUse = '';
+  private onFilterUpdate = new Subject<string>();
   private aceEditor: ace.Ace.Editor = null;
   private oldScrollPosition = 0;
   private syntaxRules = [];
   private colorBase = 'twilight';
+  private allData = '';
 
   constructor(private backendApi: BackendApiService, protected sanitizer: DomSanitizer, private config: ConfigService) {}
 
@@ -93,6 +99,19 @@ export class SyntaxHighlighterWrapperComponent implements OnInit, AfterViewInit 
         this.configuration.invokeOnScrollChanged(currentScrollPosition);
       }
     },100);
+
+    this.onFilterUpdate
+      .pipe(sampleTime(1000))
+      .subscribe(x => {
+        console.log('onFilterUpdate', x);
+        this.currentFilterInUse = x;
+        this.updateCode(this.allData, false);
+      });
+  }
+
+  public updateFilter(filterData: string) {
+    this.currentFilter = filterData;
+    this.onFilterUpdate.next(filterData);
   }
 
   private convertTokenToCss() {
@@ -121,7 +140,9 @@ export class SyntaxHighlighterWrapperComponent implements OnInit, AfterViewInit 
       this.aceEditor.session.insert({
         row: this.aceEditor.session.getLength(),
         column: 0
-      }, code);
+      }, this.updateWithFilter(code));
+
+      this.allData += code;
 
       this.configuration.setSetting('needToScroll', needToScroll);
 
@@ -132,10 +153,14 @@ export class SyntaxHighlighterWrapperComponent implements OnInit, AfterViewInit 
   }
 
 
-  private updateCode(code: string) {
+  private updateCode(code: string, setAllData = true) {
     const needToScroll = this.isCurrentlyScrolledAtBottom();
     setTimeout(() => {
-      this.aceEditor.session.setValue(code);
+      this.aceEditor.session.setValue(this.updateWithFilter(code));
+
+      if (setAllData) {
+        this.allData = code;
+      }
 
       this.configuration.setSetting('needToScroll', needToScroll);
 
@@ -143,6 +168,45 @@ export class SyntaxHighlighterWrapperComponent implements OnInit, AfterViewInit 
 
       this.configuration.invokeOnChange();
     }, 10);
+  }
+
+  private updateWithFilter(code: string): string {
+    if (this.currentFilter.trim().length === 0) {
+      return code;
+    }
+    const filters: Array<{filter: string; positive: boolean; caseSensitive: boolean}> = this.currentFilterInUse.split('|')
+      .map(x => x.trim())
+      .map(x => {
+        if (x.substring(0, 2) === '--') {
+          return {filter: x.substring(2).trim().toLowerCase(), positive: false, caseSensitive: false};
+        }
+        if (x.substring(0, 2) === '!!') {
+          return {filter: x.substring(2).trim(), positive: false, caseSensitive: true};
+        }
+        return {filter: x.trim().toLowerCase(), positive: true, caseSensitive: false};
+      });
+
+    const codeLines = code.split('\n');
+    const codeLinesToAdd = new Array<string>();
+
+    for(const codeLine of codeLines) {
+      let canBeAdd = true;
+      for (const filterItem of filters.filter(x => x.filter.length > 0)) {
+        const codeLineToCheck = filterItem.caseSensitive ? codeLine : codeLine.toLowerCase();
+        if (filterItem.positive && !codeLineToCheck.includes(filterItem.filter)) {
+          canBeAdd = false;
+        }
+        if (!filterItem.positive && codeLineToCheck.includes(filterItem.filter)) {
+          canBeAdd = false;
+        }
+      }
+
+      if (canBeAdd) {
+        codeLinesToAdd.push(codeLine);
+      }
+    }
+
+    return codeLinesToAdd.join('\n');
   }
 
   private updateScrollPosition(toTheEnd: boolean) {

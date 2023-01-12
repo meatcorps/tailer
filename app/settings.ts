@@ -1,3 +1,3 @@
 export const CentralAppConfig = {
-  version: '1.0.0i ALPHA'
+  version: '1.0.0j ALPHA'
 }

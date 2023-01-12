@@ -2,3 +2,12 @@
   border: 2px solid #f8f9fa;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }
+input.filter-input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px
+  solid rgba(255, 255, 255, 0.5);
+  padding: 10px 20px;
+  color: white;
+  display: block;
+  width: calc(100% - 42px);
+}
