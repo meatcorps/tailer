@@ -191,13 +191,21 @@ export class SyntaxHighlighterWrapperComponent implements OnInit, AfterViewInit 
 
     for(const codeLine of codeLines) {
       let canBeAdd = true;
+      let doNotChange = false;
       for (const filterItem of filters.filter(x => x.filter.length > 0)) {
         const codeLineToCheck = filterItem.caseSensitive ? codeLine : codeLine.toLowerCase();
-        if (filterItem.positive && !codeLineToCheck.includes(filterItem.filter)) {
-          canBeAdd = false;
-        }
+
         if (!filterItem.positive && codeLineToCheck.includes(filterItem.filter)) {
           canBeAdd = false;
+        }
+
+        if (filterItem.positive && !codeLineToCheck.includes(filterItem.filter) && !doNotChange) {
+          canBeAdd = false;
+        }
+
+        if (filterItem.positive && codeLineToCheck.includes(filterItem.filter)) {
+          canBeAdd = true;
+          doNotChange = true;
         }
       }
 

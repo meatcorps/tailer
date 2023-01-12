@@ -6,7 +6,7 @@
   ></div>
 </div>
 <div class="footer">
-  <input placeholder="Filter, apply multiple with |. Not cases start with --. Case sensitive start with !!" class="filter-input" [ngModel]="currentFilter" (ngModelChange)="updateFilter($event)">
+  <input placeholder="Filter, apply multiple with |. Not cases start with --. Case sensitive start with !!. Press enter to update" class="filter-input" [(ngModel)]="currentFilter" (keyup.enter)="updateFilter(currentFilter)">
 </div>
 <!--stylesheet-->
 <div [innerHTML]="tokenCss">{{tokenCss}}</div>
